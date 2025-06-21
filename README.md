@@ -164,9 +164,29 @@ Brian Dawson
 
 ## Roadmap
 
+### v0.2.0 - Roles & Permissions (Next Release)
+- [ ] Role-based access control
+- [ ] User/team management
+- [ ] Permission levels for different context types
+- [ ] Shared team contexts
+- [ ] Role inheritance system
+
+### Docker Deployment Support
+- [ ] Docker image for easy deployment
+- [ ] Docker Hub publication for `docker pull` access
+- [ ] Enable non-technical users to run locally via Docker Desktop
+- [ ] Support for hosted MCP server deployment in containers
+- [ ] Docker Compose configuration for quick setup
+- [ ] Environment variable configuration
+- [ ] Persistent volume mapping for database storage
+
+### Future Enhancements
 - [ ] Vector embeddings for semantic search
 - [ ] Import/export functionality
 - [ ] Backup and restore commands
 - [ ] Project templates
 - [ ] Time tracking integration
 - [ ] Git commit integration
+- [ ] Web UI for visualization
+- [ ] Data encryption support
+- [ ] Performance optimizations with caching
