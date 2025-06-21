@@ -18,4 +18,38 @@ export default {
     '!src/**/*.d.ts',
     '!src/**/*.test.ts',
   ],
+  // Separate test suites
+  projects: [
+    {
+      displayName: 'unit',
+      testMatch: ['<rootDir>/tests/**/*.test.ts', '!<rootDir>/tests/integration.test.ts'],
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      extensionsToTreatAsEsm: ['.ts'],
+      moduleNameMapper: {
+        '^(\\.{1,2}/.*)\\.js$': '$1',
+      },
+      transform: {
+        '^.+\\.tsx?$': ['ts-jest', {
+          useESM: true,
+        }],
+      },
+    },
+    {
+      displayName: 'integration',
+      testMatch: ['<rootDir>/tests/integration.test.ts'],
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      extensionsToTreatAsEsm: ['.ts'],
+      moduleNameMapper: {
+        '^(\\.{1,2}/.*)\\.js$': '$1',
+      },
+      transform: {
+        '^.+\\.tsx?$': ['ts-jest', {
+          useESM: true,
+        }],
+      },
+      testTimeout: 30000, // Integration tests need more time
+    }
+  ],
 };

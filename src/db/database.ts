@@ -620,4 +620,56 @@ export class DatabaseManager {
       throw new DatabaseError(`Failed to get shared context: ${(error as Error).message}`, 'get_shared_context');
     }
   }
+
+  /**
+   * Get all table names in the database
+   */
+  getAllTables(): string[] {
+    try {
+      const tables = this.db.prepare(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+      ).all() as Array<{ name: string }>;
+      
+      return tables.map(t => t.name);
+    } catch (error) {
+      throw new DatabaseError(`Failed to get tables: ${(error as Error).message}`, 'get_tables');
+    }
+  }
+
+  /**
+   * Get current schema version
+   */
+  getSchemaVersion(): number {
+    try {
+      const result = this.db.prepare(
+        'SELECT MAX(version) as version FROM schema_migrations WHERE applied_at IS NOT NULL'
+      ).get() as { version: number } | undefined;
+      
+      return result?.version || 0;
+    } catch (error) {
+      // If schema_migrations doesn't exist, we're at version 0
+      return 0;
+    }
+  }
+
+  /**
+   * Get a single context entry by ID
+   */
+  getContext(contextId: string): ContextEntry | null {
+    try {
+      const result = this.db.prepare(
+        'SELECT * FROM context_entries WHERE id = ?'
+      ).get(contextId) as ContextEntry | undefined;
+      
+      if (!result) return null;
+      
+      return {
+        ...result,
+        tags: parseJsonTags(result.tags as any),
+        metadata: parseJsonMetadata(result.metadata as any)
+      };
+    } catch (error) {
+      throw new DatabaseError(`Failed to get context: ${(error as Error).message}`, 'get_context');
+    }
+  }
 }
