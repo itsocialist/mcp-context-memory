@@ -11,6 +11,9 @@ const contextTypes: ContextType[] = [
   'todo', 'note', 'config', 'issue', 'reference'
 ];
 
+// Export context type schema for reuse
+export const contextTypeSchema = z.enum(contextTypes as [ContextType, ...ContextType[]]);
+
 // Project status enum
 const projectStatus = z.enum(['active', 'paused', 'completed', 'archived']);
 

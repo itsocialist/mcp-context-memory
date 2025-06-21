@@ -2,6 +2,9 @@
  * Type definitions for MCP Context Memory
  */
 
+// Export role types
+export * from './roles.js';
+
 // System information
 export interface SystemInfo {
   name: string;

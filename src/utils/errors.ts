@@ -149,3 +149,30 @@ export function withErrorHandling<T extends any[], R>(
     }
   };
 }
+
+
+/**
+ * Common error codes
+ */
+export const ERROR_CODES = {
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  NOT_FOUND: 'NOT_FOUND',
+  DATABASE_ERROR: 'DATABASE_ERROR',
+  SECURITY_ERROR: 'SECURITY_ERROR',
+  CONFIG_ERROR: 'CONFIG_ERROR',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR'
+} as const;
+
+/**
+ * Generic application error for flexibility
+ */
+export class ApplicationError extends MCPError {
+  readonly code: string;
+  readonly userMessage: string;
+  
+  constructor(message: string, code: string = ERROR_CODES.VALIDATION_ERROR) {
+    super(message);
+    this.code = code;
+    this.userMessage = message;
+  }
+}

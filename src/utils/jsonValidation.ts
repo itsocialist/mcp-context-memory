@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { ValidationError } from './errors.js';
 
 /**
  * Maximum sizes for JSON fields
@@ -116,5 +117,31 @@ export function parseJsonMetadata(jsonString: string): Record<string, any> {
   } catch (error) {
     // Return empty object on parse failure
     return {};
+  }
+}
+
+
+/**
+ * Validates JSON data is safe to store
+ * @param data The data to validate
+ * @throws ValidationError if data is invalid
+ */
+export function validateJSON(data: any): void {
+  if (data === null || data === undefined) {
+    return;
+  }
+  
+  // Check for circular references
+  try {
+    JSON.stringify(data);
+  } catch (error) {
+    throw new ValidationError('JSON contains circular references');
+  }
+  
+  // Validate size
+  const jsonString = JSON.stringify(data);
+  const maxSize = 1048576; // 1MB
+  if (jsonString.length > maxSize) {
+    throw new ValidationError('JSON data exceeds maximum size of 1MB');
   }
 }

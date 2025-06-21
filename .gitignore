@@ -11,6 +11,10 @@ dist/
 # Keep TypeScript source files
 !src/**/*.ts
 
+# Keep config and test files
+!jest.config.mjs
+!test-server.mjs
+
 # IDE
 .vscode/
 .idea/
@@ -42,6 +46,19 @@ coverage/
 tmp/
 temp/
 *.tmp
+*.backup
 
 # OS files
 Thumbs.db
+
+# Test scripts (not for distribution)
+concurrent-test.js
+debug-tags.js
+diagnose.js
+stress-test.js
+test-search-fix.js
+server-wrapper.js
+
+# Temporary fix scripts
+fix-typescript-errors.sh
+typescript-fixes.txt

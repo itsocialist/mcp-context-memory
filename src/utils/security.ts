@@ -192,3 +192,32 @@ export function safeJsonStringify(
     );
   }
 }
+
+
+/**
+ * Sanitize user input to prevent injection attacks
+ * @param input The input string to sanitize
+ * @returns Sanitized string
+ */
+export function sanitizeInput(input: string): string {
+  if (!input) return '';
+  
+  // Remove null bytes
+  let sanitized = input.replace(/\0/g, '');
+  
+  // Trim whitespace
+  sanitized = sanitized.trim();
+  
+  // Limit length to prevent DoS
+  const maxLength = 65535;
+  if (sanitized.length > maxLength) {
+    sanitized = sanitized.substring(0, maxLength);
+  }
+  
+  return sanitized;
+}
+
+/**
+ * Get current system ID helper (re-exported from db/helpers)
+ */
+export { getCurrentSystemId } from '../db/helpers.js';
