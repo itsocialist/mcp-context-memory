@@ -2,15 +2,20 @@
 
 A Model Context Protocol (MCP) server that provides persistent context memory for projects across Claude sessions. Never lose track of project decisions, code snippets, standards, or progress again!
 
-## ✨ New in v0.2.0: Role-Based Context Management
+## ✨ New in v0.3.0: Custom Roles
 
-Claude can now adopt different roles (Architect, Developer, DevOps, QA, Product Manager) to provide focused assistance based on the current phase of your project. Each role brings specialized knowledge and context filtering.
+Create your own specialized roles beyond the 5 defaults! Define custom roles for Security Engineers, Technical Writers, Data Engineers, or any role specific to your team's needs.
+
+## ✨ v0.2.0: Role-Based Context Management
+
+Claude can adopt different roles (Architect, Developer, DevOps, QA, Product Manager) to provide focused assistance based on the current phase of your project.
 
 ## Features
 
 - **Project Management**: Track multiple projects with repository URLs, local directories, and system-specific paths
 - **Context Storage**: Store decisions, code snippets, standards, TODOs, and more
 - **🎭 Role-Based Features**: Switch between different roles for focused assistance
+- **🎨 Custom Roles** (v0.3.0): Create specialized roles beyond the 5 defaults
 - **Multi-System Support**: Automatically detects and tracks which system you're working from
 - **Flexible Search**: Search by time, tags, project, role, or full-text
 - **Shared Context**: Store coding standards and conventions that apply across all projects
@@ -19,20 +24,21 @@ Claude can now adopt different roles (Architect, Developer, DevOps, QA, Product 
 
 ## Installation
 
-### Via npm (recommended)
+### From Source (Currently Required)
+
+Since npm publication is pending, install via git:
 
 ```bash
-npm install -g @briandawson/mcp-context-memory
-```
-
-### From source
-
-```bash
-git clone https://github.com/briandawson/mcp-context-memory.git
+git clone https://github.com/itsocialist/mcp-context-memory.git
 cd mcp-context-memory
 npm install
 npm run build
-npm link
+```
+
+### Via npm (coming soon)
+
+```bash
+# npm install -g @briandawson/mcp-context-memory
 ```
 
 ## Configuration
@@ -48,7 +54,8 @@ Add to your Claude Desktop configuration:
 {
   "mcpServers": {
     "context-memory": {
-      "command": "mcp-context-memory",
+      "command": "node",
+      "args": ["/path/to/mcp-context-memory/dist/index.js"],
       "env": {
         "MCP_CONTEXT_DB_PATH": "~/Documents/mcp-context.db"
       }
@@ -72,7 +79,7 @@ Claude: "List all my projects"
 Claude: "Mark project 'my-app' as completed"
 ```
 
-### Role Management (New in v0.2.0)
+### Role Management
 
 ```
 Claude: "List available roles"
@@ -80,6 +87,23 @@ Claude: "Switch to architect role for project 'my-app'"
 Claude: "What's my current role for 'my-app'?"
 Claude: "Create a handoff from architect to developer role"
 ```
+
+### Custom Roles (New in v0.3.0)
+
+```
+Claude: "Create a custom role called 'security-engineer' focused on security and threat modeling"
+Claude: "Import the technical writer role template"
+Claude: "Delete the custom role 'old-role'"
+Claude: "Show me available role templates"
+```
+
+You can create custom roles with specific focus areas, default tags, and preferred context types. See `examples/role-templates/` for pre-built templates including:
+- Security Engineer
+- Technical Writer
+- Data Engineer
+- Platform Engineer
+- Frontend Engineer
+- Machine Learning Engineer
 
 ### Storing Context
 
@@ -153,13 +177,55 @@ The server supports these context types:
 6. **update_project_status** - Update project status (active/paused/completed/archived)
 7. **get_recent_updates** - See what changed recently
 
-### Role Tools (v0.2.0)
-8. **list_roles** - List all available roles with their configurations
+### Role Tools
+8. **list_roles** - List all available roles (default and custom)
 9. **get_active_role** - Get the currently active role for a project
 10. **switch_role** - Switch to a different role for focused work
-11. **create_custom_role** - Create a new custom role
-12. **create_role_handoff** - Create a handoff between roles
-13. **get_role_handoffs** - View handoff history for a project
+11. **create_role_handoff** - Create a handoff between roles
+12. **get_role_handoffs** - View handoff history for a project
+
+### Custom Role Tools (v0.3.0)
+13. **create_custom_role** - Create a new custom role with specific focus areas
+14. **delete_custom_role** - Remove a custom role you created
+15. **import_role_template** - Import a role template from JSON
+
+## Creating Custom Roles
+
+Custom roles allow you to define specialized roles beyond the 5 defaults. Each custom role can:
+- Inherit from a base role (architect, developer, devops, qa, product)
+- Define specific focus areas
+- Set default tags for automatic tagging
+- Specify preferred context types
+
+### Example: Create a Security Engineer Role
+
+```json
+{
+  "tool": "create_custom_role",
+  "arguments": {
+    "id": "security-engineer",
+    "name": "Security Engineer",
+    "description": "Focuses on security architecture and threat modeling",
+    "base_role_id": "architect",
+    "focus_areas": ["security", "threats", "compliance", "vulnerabilities"],
+    "default_tags": ["security", "threat-model"],
+    "preferred_context_types": ["issue", "decision", "standard"]
+  }
+}
+```
+
+### Using Role Templates
+
+Pre-built templates are available in `examples/role-templates/`. Import them using:
+
+```json
+{
+  "tool": "import_role_template",
+  "arguments": {
+    "template_json": "<paste template content here>"
+  }
+}
+```
 
 ## Database Location
 
@@ -218,13 +284,20 @@ Brian Dawson
 
 ## Roadmap
 
+### ✅ v0.3.0 - Custom Roles (Released!)
+- [x] Create custom roles beyond the 5 defaults
+- [x] Delete custom roles (system-specific)
+- [x] Import role templates from JSON
+- [x] Role template examples
+- [x] Enhanced security for role creation
+- [x] Backward compatibility maintained
+
 ### ✅ v0.2.0 - Roles & Permissions (Released!)
 - [x] Role-based context management
 - [x] Default roles (Architect, Developer, DevOps, QA, Product Manager)
 - [x] Role switching and active role tracking
 - [x] Role-specific context filtering
 - [x] Structured role handoffs
-- [x] Custom role creation
 - [x] Backward compatibility maintained
 
 ### Docker Deployment Support
