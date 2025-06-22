@@ -2,14 +2,20 @@
 
 A Model Context Protocol (MCP) server that provides persistent context memory for projects across Claude sessions. Never lose track of project decisions, code snippets, standards, or progress again!
 
+## ✨ New in v0.2.0: Role-Based Context Management
+
+Claude can now adopt different roles (Architect, Developer, DevOps, QA, Product Manager) to provide focused assistance based on the current phase of your project. Each role brings specialized knowledge and context filtering.
+
 ## Features
 
 - **Project Management**: Track multiple projects with repository URLs, local directories, and system-specific paths
 - **Context Storage**: Store decisions, code snippets, standards, TODOs, and more
+- **🎭 Role-Based Features**: Switch between different roles for focused assistance
 - **Multi-System Support**: Automatically detects and tracks which system you're working from
-- **Flexible Search**: Search by time, tags, project, or full-text
+- **Flexible Search**: Search by time, tags, project, role, or full-text
 - **Shared Context**: Store coding standards and conventions that apply across all projects
 - **Update History**: Track all changes with automatic timestamps
+- **Role Handoffs**: Create structured handoffs between roles with key context
 
 ## Installation
 
@@ -66,6 +72,15 @@ Claude: "List all my projects"
 Claude: "Mark project 'my-app' as completed"
 ```
 
+### Role Management (New in v0.2.0)
+
+```
+Claude: "List available roles"
+Claude: "Switch to architect role for project 'my-app'"
+Claude: "What's my current role for 'my-app'?"
+Claude: "Create a handoff from architect to developer role"
+```
+
 ### Storing Context
 
 ```
@@ -81,7 +96,37 @@ Claude: "What was updated yesterday?"
 Claude: "Show me everything about project 'my-app'"
 Claude: "Find all decisions tagged with 'database'"
 Claude: "What are our coding standards?"
+Claude: "Show me architect decisions for 'my-app'"
 ```
+
+## Default Roles
+
+The system includes five default roles, each with specialized focus areas:
+
+### 🏗️ Software Architect
+- **Focus**: System design, architecture decisions, technical standards
+- **Context Types**: decisions, standards, references
+- **Tags**: architecture, design, decision
+
+### 💻 Software Developer
+- **Focus**: Implementation, code patterns, debugging, features
+- **Context Types**: code, todo, issue, note
+- **Tags**: implementation, code, feature
+
+### 🚀 DevOps Engineer
+- **Focus**: Deployment, infrastructure, monitoring, CI/CD
+- **Context Types**: config, status, issue, decision
+- **Tags**: deployment, infrastructure, operations
+
+### 🧪 QA Engineer
+- **Focus**: Testing, quality, bugs, test plans
+- **Context Types**: issue, todo, standard, note
+- **Tags**: testing, quality, bug
+
+### 📋 Product Manager
+- **Focus**: Requirements, user stories, priorities, roadmap
+- **Context Types**: decision, todo, reference, note
+- **Tags**: product, requirement, priority
 
 ## Context Types
 
@@ -99,6 +144,7 @@ The server supports these context types:
 
 ## Tools Available
 
+### Core Tools
 1. **store_project_context** - Create or update project information
 2. **store_context** - Store context entries (project-specific or shared)
 3. **search_context** - Search with flexible filters
@@ -106,6 +152,14 @@ The server supports these context types:
 5. **list_projects** - List all projects with summaries
 6. **update_project_status** - Update project status (active/paused/completed/archived)
 7. **get_recent_updates** - See what changed recently
+
+### Role Tools (v0.2.0)
+8. **list_roles** - List all available roles with their configurations
+9. **get_active_role** - Get the currently active role for a project
+10. **switch_role** - Switch to a different role for focused work
+11. **create_custom_role** - Create a new custom role
+12. **create_role_handoff** - Create a handoff between roles
+13. **get_role_handoffs** - View handoff history for a project
 
 ## Database Location
 
@@ -164,12 +218,14 @@ Brian Dawson
 
 ## Roadmap
 
-### v0.2.0 - Roles & Permissions (Next Release)
-- [ ] Role-based access control
-- [ ] User/team management
-- [ ] Permission levels for different context types
-- [ ] Shared team contexts
-- [ ] Role inheritance system
+### ✅ v0.2.0 - Roles & Permissions (Released!)
+- [x] Role-based context management
+- [x] Default roles (Architect, Developer, DevOps, QA, Product Manager)
+- [x] Role switching and active role tracking
+- [x] Role-specific context filtering
+- [x] Structured role handoffs
+- [x] Custom role creation
+- [x] Backward compatibility maintained
 
 ### Docker Deployment Support
 - [ ] Docker image for easy deployment

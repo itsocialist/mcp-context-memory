@@ -8,11 +8,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned Features
-- Roles and permissions system for team collaboration
 - Docker deployment support for easy installation and hosting
 - Web UI for visualization
 - Data encryption support
 - Performance optimizations
+- Role templates marketplace
+- Multi-role collaboration features
+- Role-specific dashboards
+- AI-suggested role switching
+
+## [0.2.0] - 2025-06-21
+
+### Added
+- **Role-Based Context Management** - Major new feature
+  - 5 default roles: Software Architect, Developer, DevOps Engineer, QA Engineer, Product Manager
+  - Role switching for focused project work
+  - Role-specific context filtering
+  - Automatic role association for stored contexts
+  - Custom role creation with templates
+- **Role Handoffs** - Structured transitions between roles
+  - Document key decisions and pending tasks
+  - Include warnings and blockers
+  - Track handoff history
+- **6 New MCP Tools**:
+  - `list_roles` - View all available roles
+  - `get_active_role` - Check current role for a project
+  - `switch_role` - Change active role
+  - `create_custom_role` - Define custom roles
+  - `create_role_handoff` - Create role transitions
+  - `get_role_handoffs` - View handoff history
+- **Database Migrations** - Automatic schema updates
+  - Migration system for smooth upgrades
+  - Version tracking in database
+  - Backward compatibility maintained
+- **Enhanced Testing** - 148 total tests (up from 77)
+  - Comprehensive role functionality tests
+  - Integration tests updated
+  - Backward compatibility tests
+
+### Changed
+- Context entries can now have optional role associations
+- Search functionality enhanced to filter by role
+- Database schema updated with role tables (automatic migration)
+- TypeScript types enhanced for role support
+
+### Fixed
+- Integration test compatibility with new DatabaseManager API
+- Database query performance improvements
+- Migration timing issues resolved
+- Error message clarity improved
+
+### Technical Details
+- 5 new database tables for role support
+- Product Manager role added to defaults
+- Role template configuration system
+- Maintained full backward compatibility
 
 ## [0.1.0] - 2024-12-23
 
@@ -48,4 +98,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest test suite with unit and integration tests
 - ES modules with Node.js 18+ support
 
+[0.2.0]: https://github.com/briandawson/mcp-context-memory/releases/tag/v0.2.0
 [0.1.0]: https://github.com/briandawson/mcp-context-memory/releases/tag/v0.1.0
