@@ -13,6 +13,22 @@ export { DatabaseManager };
 let globalDb: DatabaseManager | null = null;
 
 /**
+ * Set a custom database instance (for testing)
+ */
+export function setTestDatabase(db: Database.Database | null): void {
+  if (db) {
+    // Create a mock DatabaseManager wrapper
+    globalDb = {
+      db,
+      close: () => db.close(),
+      getMigrationStatus: () => ({ currentVersion: 3, pendingMigrations: [] })
+    } as any;
+  } else {
+    globalDb = null;
+  }
+}
+
+/**
  * Get or create the database instance
  */
 export async function getDatabase(): Promise<Database.Database> {

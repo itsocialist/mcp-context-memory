@@ -27,6 +27,9 @@ import { getActiveRoleTool, getActiveRole } from './tools/getActiveRole.js';
 import { switchRoleTool, switchRole } from './tools/switchRole.js';
 import { createRoleHandoffTool, createRoleHandoff } from './tools/createRoleHandoff.js';
 import { getRoleHandoffsTool, getRoleHandoffs } from './tools/getRoleHandoffs.js';
+import { createCustomRoleTool, createCustomRole } from './tools/createCustomRole.js';
+import { deleteCustomRoleTool, deleteCustomRole } from './tools/deleteCustomRole.js';
+import { importRoleTemplateTool, importRoleTemplate } from './tools/importRoleTemplate.js';
 
 class MCPContextMemoryServer {
   private server: Server;
@@ -65,6 +68,9 @@ class MCPContextMemoryServer {
         switchRoleTool,
         createRoleHandoffTool,
         getRoleHandoffsTool,
+        createCustomRoleTool,
+        deleteCustomRoleTool,
+        importRoleTemplateTool,
       ],
     }));
 
@@ -122,6 +128,15 @@ class MCPContextMemoryServer {
             break;
           case 'get_role_handoffs':
             result = await getRoleHandoffs(args);
+            break;
+          case 'create_custom_role':
+            result = await createCustomRole(args);
+            break;
+          case 'delete_custom_role':
+            result = await deleteCustomRole(args);
+            break;
+          case 'import_role_template':
+            result = await importRoleTemplate(args);
             break;
           default:
             throw new Error(`Unknown tool: ${name}`);
