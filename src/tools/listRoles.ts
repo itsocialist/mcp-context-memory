@@ -5,7 +5,8 @@
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import { getDatabase } from '../db/helpers.js';
-import { getCurrentSystemId, sanitizeInput } from '../utils/security.js';
+import { getCurrentSystemId } from '../db/helpers.js';
+import { sanitizeInput } from '../utils/security.js';
 import { ApplicationError, ERROR_CODES } from '../utils/errors.js';
 
 const inputSchema = z.object({

@@ -22,6 +22,11 @@ import { createGetProjectContextTool, handleGetProjectContext } from './tools/ge
 import { createListProjectsTool, handleListProjects } from './tools/listProjects.js';
 import { createUpdateProjectStatusTool, handleUpdateProjectStatus } from './tools/updateProjectStatus.js';
 import { createGetRecentUpdatesTool, handleGetRecentUpdates } from './tools/getRecentUpdates.js';
+import { listRolesTool, listRoles } from './tools/listRoles.js';
+import { getActiveRoleTool, getActiveRole } from './tools/getActiveRole.js';
+import { switchRoleTool, switchRole } from './tools/switchRole.js';
+import { createRoleHandoffTool, createRoleHandoff } from './tools/createRoleHandoff.js';
+import { getRoleHandoffsTool, getRoleHandoffs } from './tools/getRoleHandoffs.js';
 
 class MCPContextMemoryServer {
   private server: Server;
@@ -32,7 +37,7 @@ class MCPContextMemoryServer {
     this.server = new Server(
       {
         name: 'mcp-context-memory',
-        version: '0.1.0',
+        version: '0.2.1',
       },
       {
         capabilities: {
@@ -55,6 +60,11 @@ class MCPContextMemoryServer {
         createListProjectsTool(this.db),
         createUpdateProjectStatusTool(this.db),
         createGetRecentUpdatesTool(this.db),
+        listRolesTool,
+        getActiveRoleTool,
+        switchRoleTool,
+        createRoleHandoffTool,
+        getRoleHandoffsTool,
       ],
     }));
 
@@ -95,6 +105,23 @@ class MCPContextMemoryServer {
             break;
           case 'get_recent_updates':
             result = await handleGetRecentUpdates(this.db, args);
+            break;
+          case 'list_roles':
+            const rolesResult = await listRoles(args);
+            result = JSON.stringify(rolesResult, null, 2);
+            break;
+          case 'get_active_role':
+            const activeRoleResult = await getActiveRole(args);
+            result = JSON.stringify(activeRoleResult, null, 2);
+            break;
+          case 'switch_role':
+            result = await switchRole(args);
+            break;
+          case 'create_role_handoff':
+            result = await createRoleHandoff(args);
+            break;
+          case 'get_role_handoffs':
+            result = await getRoleHandoffs(args);
             break;
           default:
             throw new Error(`Unknown tool: ${name}`);

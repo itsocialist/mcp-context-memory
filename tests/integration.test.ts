@@ -6,40 +6,29 @@ import { DatabaseManager } from '../src/db/database.js';
 import { DEFAULT_ROLE_IDS } from '../src/types/roles.js';
 import Database from 'better-sqlite3';
 import { getCurrentSystemId } from '../src/db/helpers.js';
+import { TestDatabaseManager, setupTestDatabase } from '../src/test-utils/test-database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Setup test database cleanup
+setupTestDatabase();
+
 describe('MCP Database Integration Tests', () => {
   let db: DatabaseManager;
   let rawDb: Database.Database;
-  const testDbPath = path.join(__dirname, 'test-integration.db');
 
   beforeEach(async () => {
-    // Remove test database if it exists
-    try {
-      await fs.unlink(testDbPath);
-    } catch (error) {
-      // Ignore if file doesn't exist
-    }
-
-    // Initialize database
-    db = await DatabaseManager.create(testDbPath);
+    // Create isolated test database
+    db = await TestDatabaseManager.createTestDatabase('integration');
     // Access the raw database for direct operations (for testing internal methods)
     rawDb = (db as any).db;
   });
 
   afterEach(async () => {
-    // Close database
-    if (db) {
-      db.close();
-    }
-
     // Clean up test database
-    try {
-      await fs.unlink(testDbPath);
-    } catch (error) {
-      // Ignore if file doesn't exist
+    if (db) {
+      await TestDatabaseManager.cleanupDatabase(db);
     }
   });
 

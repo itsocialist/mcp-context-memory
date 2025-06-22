@@ -17,6 +17,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Role-specific dashboards
 - AI-suggested role switching
 
+## [0.2.1] - 2025-06-21
+
+### Fixed
+- **Test Database Isolation** - Fixed test contamination issues
+  - Implemented TestDatabaseManager for proper test isolation
+  - Each test gets unique temporary database
+  - Automatic cleanup prevents data persistence between runs
+- **Missing Role Tools** - Added MCP tools for role management
+  - `list_roles` - View available roles
+  - `get_active_role` - Check current role
+  - `switch_role` - Change active role  
+  - `create_role_handoff` - Create role transitions
+  - `get_role_handoffs` - View handoff history
+
+### Changed
+- Import paths fixed for better module resolution
+- Tool response formatting improved for consistency
+- Error codes standardized across role tools
+
+### Technical
+- Test databases now use system temp directory
+- Timestamp-based naming for test database uniqueness
+- All 148 tests passing with proper isolation
+
 ## [0.2.0] - 2025-06-21
 
 ### Added
@@ -98,5 +122,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest test suite with unit and integration tests
 - ES modules with Node.js 18+ support
 
+[0.2.1]: https://github.com/briandawson/mcp-context-memory/releases/tag/v0.2.1
 [0.2.0]: https://github.com/briandawson/mcp-context-memory/releases/tag/v0.2.0
 [0.1.0]: https://github.com/briandawson/mcp-context-memory/releases/tag/v0.1.0
