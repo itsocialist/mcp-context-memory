@@ -17,6 +17,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Role-specific dashboards
 - AI-suggested role switching
 
+## [0.3.0] - 2025-06-21
+
+### Added
+- **Custom Roles Feature** - Create your own roles beyond the 5 defaults
+  - `create_custom_role` - Create custom roles with unique focus areas
+  - `delete_custom_role` - Remove custom roles you created
+  - `import_role_template` - Import role templates from JSON
+  - Role validation and sanitization for security
+  - Base role inheritance (extend existing roles)
+  - System-specific role tracking
+- **Enhanced Role Management**
+  - Support for unlimited custom roles
+  - Role ID validation (alphanumeric with dashes/underscores)
+  - Reserved role ID protection
+  - Usage statistics on role deletion
+  - Marketplace-ready template format
+- **Comprehensive Testing** - 19 new tests for custom roles
+  - Create, delete, and import functionality
+  - Security and validation tests
+  - Integration with existing role system
+  - Full lifecycle testing
+
+### Changed
+- Migration system updated with custom roles schema
+- Database now tracks role creation system
+- Role validator utility added for input sanitization
+- Enhanced error messages for role operations
+
+### Security
+- Input sanitization for custom role creation
+- Protection against XSS in role descriptions
+- Array size limits to prevent memory exhaustion
+- Reserved role ID protection
+
+### Technical Details
+- New migration: 003_custom_roles.ts
+- 3 new MCP tools for custom role management
+- Role template JSON schema defined
+- Backward compatibility maintained
+
 ## [0.2.1] - 2025-06-22
 
 ### Fixed
@@ -136,6 +176,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest test suite with unit and integration tests
 - ES modules with Node.js 18+ support
 
-[0.2.1]: https://github.com/briandawson/mcp-context-memory/releases/tag/v0.2.1
-[0.2.0]: https://github.com/briandawson/mcp-context-memory/releases/tag/v0.2.0
-[0.1.0]: https://github.com/briandawson/mcp-context-memory/releases/tag/v0.1.0
+[0.3.0]: https://github.com/itsocialist/mcp-context-memory/releases/tag/v0.3.0
+[0.2.1]: https://github.com/itsocialist/mcp-context-memory/releases/tag/v0.2.1
+[0.2.0]: https://github.com/itsocialist/mcp-context-memory/releases/tag/v0.2.0
+[0.1.0]: https://github.com/itsocialist/mcp-context-memory/releases/tag/v0.1.0
