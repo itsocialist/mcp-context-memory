@@ -36,31 +36,30 @@ This directory contains example role templates that you can import into your MCP
 
 ## How to Use These Templates
 
+Templates are imported directly in your Claude conversation. There's no separate installation process.
+
 ### Method 1: Import via MCP Tool
 ```bash
-# In Claude, use the import_role_template tool with the template JSON
-{
-  "tool": "import_role_template",
-  "arguments": {
-    "template_json": "<paste template content here>"
-  }
-}
+# In Claude, copy the template content and say:
+"Import this role template: <paste the JSON content from any template file>"
+
+# Or be more specific:
+"Import the security engineer role template"
+# Then paste the content when Claude asks
 ```
 
 ### Method 2: Import with Custom ID
 ```bash
 # Override the template's ID during import
-{
-  "tool": "import_role_template",
-  "arguments": {
-    "template_json": "<paste template content here>",
-    "role_id": "my-custom-security-role"
-  }
-}
+"Import this template but call it 'my-security-role' instead"
+# Then paste the template JSON
 ```
 
 ### Method 3: Create Based on Template
-Use `create_custom_role` tool and modify the template values as needed.
+```bash
+# Ask Claude to create a role based on a template
+"Create a custom role like the security engineer template but focused more on cloud security"
+```
 
 ## Creating Your Own Templates
 
