@@ -17,9 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Role-specific dashboards
 - AI-suggested role switching
 
-## [0.2.1] - 2025-06-21
+## [0.2.1] - 2025-06-22
 
 ### Fixed
+- **Critical: Roles Table Missing** - Fixed database schema issue for existing users
+  - Created hotfix script for users upgrading from pre-v0.2.0
+  - Roles tables now properly created on existing databases
+  - Migration system now properly applies all migrations
 - **Test Database Isolation** - Fixed test contamination issues
   - Implemented TestDatabaseManager for proper test isolation
   - Each test gets unique temporary database
@@ -32,14 +36,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `get_role_handoffs` - View handoff history
 
 ### Changed
+- **Project Structure Reorganization**
+  - Scripts moved to `scripts/` directory
+  - Documentation organized into `docs/` with subdirectories
+  - Release notes in `docs/releases/`
+  - Cleaner top-level directory structure
 - Import paths fixed for better module resolution
 - Tool response formatting improved for consistency
 - Error codes standardized across role tools
+
+### Added
+- `HOTFIX-ROLES.md` - Instructions for fixing roles table issue
+- `hotfix-roles-schema.js` - Script to apply roles schema to existing databases
 
 ### Technical
 - Test databases now use system temp directory
 - Timestamp-based naming for test database uniqueness
 - All 148 tests passing with proper isolation
+- Node version managed with `.nvmrc`
 
 ## [0.2.0] - 2025-06-21
 
