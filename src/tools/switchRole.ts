@@ -73,8 +73,8 @@ export async function switchRole(input: unknown) {
   
   // Log the switch in update history
   db.prepare(`
-    INSERT INTO update_history (entity_type, entity_id, action, details)
-    VALUES ('project', ?, 'role_switch', json(?))
+    INSERT INTO update_history (entity_type, entity_id, action, changes)
+    VALUES ('project', ?, 'role_switch', ?)
   `).run(
     project.id,
     JSON.stringify({
