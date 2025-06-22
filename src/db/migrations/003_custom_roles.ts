@@ -10,7 +10,7 @@ export const migration_003_custom_roles = {
   name: 'Add custom roles support',
   
   up: (db: Database) => {
-    console.log('Adding custom roles support...');
+    // console.log('Adding custom roles support...');
     
     // Add columns to roles table for custom role support
     // Note: is_custom already exists from initial schema
@@ -51,11 +51,11 @@ export const migration_003_custom_roles = {
       ON role_templates(downloads DESC);
     `);
     
-    console.log('✅ Custom roles support added successfully');
+    // console.log('✅ Custom roles support added successfully');
   },
   
   down: (db: Database) => {
-    console.log('Removing custom roles support...');
+    // console.log('Removing custom roles support...');
     
     // Drop indexes
     db.exec(`
@@ -71,6 +71,6 @@ export const migration_003_custom_roles = {
     // Note: We can't easily remove columns in SQLite
     // Would need to recreate the table, which is risky
     // For now, we'll leave the columns but document this limitation
-    console.log('⚠️  Note: Added columns remain in roles table (SQLite limitation)');
+    // console.log('⚠️  Note: Added columns remain in roles table (SQLite limitation)');
   }
 };

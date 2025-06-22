@@ -103,7 +103,7 @@ export class MigrationManager {
       for (const migration of migrations) {
         if (migration.version > currentVersion) {
           try {
-            console.log(`Running migration ${migration.version}: ${migration.name}`);
+            // console.log(`Running migration ${migration.version}: ${migration.name}`);
             migration.up(this.db);
             
             // Record the migration
@@ -111,7 +111,7 @@ export class MigrationManager {
               'INSERT INTO schema_migrations (version, name) VALUES (?, ?)'
             ).run(migration.version, migration.name);
             
-            console.log(`✅ Migration ${migration.version} completed`);
+            // console.log(`✅ Migration ${migration.version} completed`);
           } catch (error) {
             throw new DatabaseError(
               `Migration ${migration.version} failed: ${(error as Error).message}`
