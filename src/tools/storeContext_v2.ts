@@ -207,8 +207,8 @@ export async function storeContext(input: unknown) {
     
     // Log the action
     db.prepare(`
-      INSERT INTO update_history (entity_type, entity_id, action, details, role_id)
-      VALUES ('context', ?, ?, json(?), ?)
+      INSERT INTO update_history (entity_type, entity_id, action, changes, user_note)
+      VALUES ('context', ?, ?, ?, ?)
     `).run(
       contextId,
       existing ? 'update' : 'create',
@@ -220,7 +220,7 @@ export async function storeContext(input: unknown) {
         tags,
         role_id: activeRoleId
       }),
-      activeRoleId
+      activeRoleId ? `Role: ${activeRoleId}` : null
     );
     
     // Build response message

@@ -178,7 +178,7 @@ export async function createHandoff(input: unknown) {
     
     // Log the handoff
     db.prepare(`
-      INSERT INTO update_history (entity_type, entity_id, action, details, role_id)
+      INSERT INTO update_history (entity_type, entity_id, action, changes, user_note)
       VALUES ('project', ?, 'create_handoff', json(?), ?)
     `).run(
       project.id,
