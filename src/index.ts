@@ -35,9 +35,9 @@ import { deleteCustomRoleTool, deleteCustomRole } from './tools/deleteCustomRole
 import { importRoleTemplateTool, importRoleTemplate } from './tools/importRoleTemplate.js';
 
 // Import deletion tools (v0.3.1)
-import { deleteProjectTool, deleteProject } from './tools/deleteProject.js';
-import { deleteContextTool, deleteContext } from './tools/deleteContext.js';
-import { cleanupOldDataTool, cleanupOldData } from './tools/cleanupOldData.js';
+import { createDeleteProjectTool, deleteProject } from './tools/deleteProject.js';
+import { createDeleteContextTool, deleteContext } from './tools/deleteContext.js';
+import { createCleanupOldDataTool, cleanupOldData } from './tools/cleanupOldData.js';
 
 class MCPContextMemoryServer {
   private server: Server;
@@ -82,9 +82,9 @@ class MCPContextMemoryServer {
         deleteCustomRoleTool,
         importRoleTemplateTool,
         // Deletion tools (v0.3.1)
-        deleteProjectTool,
-        deleteContextTool,
-        cleanupOldDataTool,
+        createDeleteProjectTool(this.db),
+        createDeleteContextTool(this.db),
+        createCleanupOldDataTool(this.db),
       ],
     }));
 
@@ -157,13 +157,13 @@ class MCPContextMemoryServer {
             
           // Deletion tools (v0.3.1)
           case 'delete_project':
-            result = await deleteProject(args);
+            result = await deleteProject(this.db, args);
             break;
           case 'delete_context':
-            result = await deleteContext(args);
+            result = await deleteContext(this.db, args);
             break;
           case 'cleanup_old_data':
-            result = await cleanupOldData(args);
+            result = await cleanupOldData(this.db, args);
             break;
             
           default:

@@ -1,10 +1,10 @@
 /**
- * Delete a project and all associated data
+ * Delete a project and all associated data (HARD DELETE)
  */
 
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
-import { getDatabase, getCurrentSystemId } from '../db/helpers.js';
+import { DatabaseManager } from '../db/database.js';
 import { sanitizeInput } from '../utils/security.js';
 import { ApplicationError, ERROR_CODES } from '../utils/errors.js';
 
@@ -13,33 +13,35 @@ const inputSchema = z.object({
   confirm: z.boolean()
 });
 
-export const deleteProjectTool: Tool = {
-  name: 'delete_project',
-  description: `Delete a project and all associated data. Requires confirmation. Data is soft-deleted and can be recovered within 7 days.
+export function createDeleteProjectTool(db: DatabaseManager): Tool {
+  return {
+    name: 'delete_project',
+    description: `Delete a project and all associated data. Requires confirmation. This is a permanent deletion.
 
 Examples:
 - "Delete project 'old-prototype' with confirmation"
 - "Remove abandoned project 'test-app-v1'"
 - "Clean up project 'demo-2023' (must confirm: true)"
 
-Warning: This cascades to all contexts, role assignments, and handoffs!`,
-  inputSchema: {
-    type: 'object',
-    properties: {
-      project_name: {
-        type: 'string',
-        description: 'The name of the project to delete'
+Warning: This permanently deletes all contexts, role assignments, and handoffs!`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        project_name: {
+          type: 'string',
+          description: 'The name of the project to delete'
+        },
+        confirm: {
+          type: 'boolean',
+          description: 'Must be true to confirm deletion'
+        }
       },
-      confirm: {
-        type: 'boolean',
-        description: 'Must be true to confirm deletion'
-      }
-    },
-    required: ['project_name', 'confirm']
-  }
-};
+      required: ['project_name', 'confirm']
+    }
+  };
+}
 
-export async function deleteProject(input: unknown) {
+export async function deleteProject(db: DatabaseManager, input: unknown): Promise<string> {
   const validated = inputSchema.parse(input);
   
   if (!validated.confirm) {
@@ -49,14 +51,10 @@ export async function deleteProject(input: unknown) {
     );
   }
   
-  const db = await getDatabase();
-  const systemId = await getCurrentSystemId(db);
   const projectName = sanitizeInput(validated.project_name);
   
   // Get project
-  const project = db.prepare(
-    'SELECT id, name, deleted_at FROM projects WHERE name = ?'
-  ).get(projectName) as { id: number; name: string; deleted_at: string | null } | undefined;
+  const project = db.getProject(projectName);
   
   if (!project) {
     throw new ApplicationError(
@@ -65,88 +63,84 @@ export async function deleteProject(input: unknown) {
     );
   }
   
-  if (project.deleted_at) {
-    throw new ApplicationError(
-      `Project '${projectName}' is already deleted`,
-      ERROR_CODES.VALIDATION_ERROR
-    );
-  }
+  // Get the raw database for queries
+  const rawDb = (db as any).db;
+  const system = db.getCurrentSystem();
+  const systemId = system?.id || 1;
   
   // Check for active roles
-  const activeRoles = db.prepare(`
+  const activeRoleCheck = rawDb.prepare(`
     SELECT COUNT(*) as count 
-    FROM active_roles ar
-    WHERE ar.project_id = ?
+    FROM active_roles
+    WHERE project_id = ?
   `).get(project.id) as { count: number };
   
-  if (activeRoles.count > 0) {
+  if (activeRoleCheck.count > 0) {
     throw new ApplicationError(
       `Cannot delete project with active roles. Please switch roles first.`,
       ERROR_CODES.VALIDATION_ERROR
     );
   }
   
-  // Perform soft delete with cascade
-  const deletedAt = new Date().toISOString();
-  
-  const result = db.transaction(() => {
-    // Delete project
-    db.prepare(`
-      UPDATE projects 
-      SET deleted_at = ?, deleted_by = ?
-      WHERE id = ?
-    `).run(deletedAt, systemId, project.id);
+  // Perform HARD delete with cascade
+  const result = rawDb.transaction(() => {
+      // Count items before deletion for summary
+      const contextCount = rawDb.prepare(
+        'SELECT COUNT(*) as count FROM context_entries WHERE project_id = ?'
+      ).get(project.id) as { count: number };
+      
+      const roleCount = rawDb.prepare(
+        'SELECT COUNT(*) as count FROM project_roles WHERE project_id = ?'
+      ).get(project.id) as { count: number };
+      
+      const handoffCount = rawDb.prepare(
+        'SELECT COUNT(*) as count FROM role_handoffs WHERE project_id = ?'
+      ).get(project.id) as { count: number };
+      
+      // Delete from context_search first (FTS5 table)
+      rawDb.prepare(`
+        DELETE FROM context_search 
+        WHERE project_name = ?
+      `).run(projectName);
+      
+      // Delete all related data
+      rawDb.prepare('DELETE FROM role_handoffs WHERE project_id = ?').run(project.id);
+      rawDb.prepare('DELETE FROM active_roles WHERE project_id = ?').run(project.id);
+      rawDb.prepare('DELETE FROM project_roles WHERE project_id = ?').run(project.id);
+      rawDb.prepare('DELETE FROM context_entries WHERE project_id = ?').run(project.id);
+      
+      // Delete the project itself
+      rawDb.prepare('DELETE FROM projects WHERE id = ?').run(project.id);
+      
+      // Log deletion
+      rawDb.prepare(`
+        INSERT INTO update_history (entity_type, entity_id, action, changes)
+        VALUES ('project', ?, 'hard_delete', ?)
+      `).run(
+        project.id,
+        JSON.stringify({
+          project_name: projectName,
+          contexts_deleted: contextCount.count,
+          roles_deleted: roleCount.count,
+          handoffs_deleted: handoffCount.count,
+          deleted_by: systemId,
+          deletion_type: 'permanent'
+        })
+      );
+      
+      return {
+        contextsDeleted: contextCount.count,
+        rolesDeleted: roleCount.count,
+        handoffsDeleted: handoffCount.count
+      };
+    })();
     
-    // Cascade delete contexts
-    const contextsDeleted = db.prepare(`
-      UPDATE context_entries 
-      SET deleted_at = ?, deleted_by = ?
-      WHERE project_id = ? AND deleted_at IS NULL
-    `).run(deletedAt, systemId, project.id);
-    
-    // Cascade delete role assignments
-    const rolesDeleted = db.prepare(`
-      UPDATE project_roles 
-      SET is_active = 0
-      WHERE project_id = ?
-    `).run(project.id);
-    
-    // Cascade delete handoffs
-    const handoffsDeleted = db.prepare(`
-      UPDATE role_handoffs 
-      SET deleted_at = ?, deleted_by = ?
-      WHERE project_id = ? AND deleted_at IS NULL
-    `).run(deletedAt, systemId, project.id);
-    
-    // Log deletion
-    db.prepare(`
-      INSERT INTO update_history (entity_type, entity_id, action, changes)
-      VALUES ('project', ?, 'delete', ?)
-    `).run(
-      project.id,
-      JSON.stringify({
-        project_name: projectName,
-        contexts_deleted: contextsDeleted.changes,
-        roles_deactivated: rolesDeleted.changes,
-        handoffs_deleted: handoffsDeleted.changes,
-        deleted_by: systemId
-      })
-    );
-    
-    return {
-      contextsDeleted: contextsDeleted.changes,
-      rolesDeactivated: rolesDeleted.changes,
-      handoffsDeleted: handoffsDeleted.changes
-    };
-  })();
-  
-  return `✅ Project '${projectName}' successfully deleted
+    return `✅ Project '${projectName}' permanently deleted
 
 Deletion Summary:
 - Contexts deleted: ${result.contextsDeleted}
-- Role assignments deactivated: ${result.rolesDeactivated}
+- Role assignments deleted: ${result.rolesDeleted}
 - Handoffs deleted: ${result.handoffsDeleted}
 
-⚠️  This is a soft delete. Data will be permanently removed after 7 days.
-To recover this project, contact your administrator within 7 days.`;
+⚠️  This deletion is permanent and cannot be undone.`;
 }

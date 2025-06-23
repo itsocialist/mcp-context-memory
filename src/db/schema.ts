@@ -117,7 +117,6 @@ export const statements = {
     FROM context_entries ce
     LEFT JOIN systems s ON ce.system_id = s.id
     WHERE ce.project_id = ?
-    AND ce.deleted_at IS NULL
     ORDER BY ce.updated_at DESC
     LIMIT 100
   `,
