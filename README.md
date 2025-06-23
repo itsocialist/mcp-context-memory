@@ -2,7 +2,11 @@
 
 A Model Context Protocol (MCP) server that provides persistent context memory for projects across Claude sessions. Never lose track of project decisions, code snippets, standards, or progress again!
 
-## ✨ New in v0.3.0: Custom Roles
+## ✨ New in v0.3.1: Deletion Tools & Performance
+
+Clean up your context memory with three new deletion tools! Remove old projects, outdated contexts, or perform time-based cleanup with safety features like dry-run preview and confirmation requirements.
+
+## ✨ v0.3.0: Custom Roles
 
 Create your own specialized roles beyond the 5 defaults! Define custom roles for Security Engineers, Technical Writers, Data Engineers, or any role specific to your team's needs.
 
@@ -16,11 +20,13 @@ Claude can adopt different roles (Architect, Developer, DevOps, QA, Product Mana
 - **Context Storage**: Store decisions, code snippets, standards, TODOs, and more
 - **🎭 Role-Based Features**: Switch between different roles for focused assistance
 - **🎨 Custom Roles** (v0.3.0): Create specialized roles beyond the 5 defaults
+- **🧹 Deletion Tools** (v0.3.1): Clean up projects and contexts with safety features
 - **Multi-System Support**: Automatically detects and tracks which system you're working from
 - **Flexible Search**: Search by time, tags, project, role, or full-text
 - **Shared Context**: Store coding standards and conventions that apply across all projects
 - **Update History**: Track all changes with automatic timestamps
 - **Role Handoffs**: Create structured handoffs between roles with key context
+- **Performance Optimized**: Handles large context stores without memory issues
 
 ## Installation
 
@@ -123,6 +129,15 @@ Claude: "What are our coding standards?"
 Claude: "Show me architect decisions for 'my-app'"
 ```
 
+### Data Management (New in v0.3.1)
+
+```
+Claude: "Delete project 'old-prototype' with confirmation"
+Claude: "Remove context entry 'outdated-api-docs' from project 'my-app'"
+Claude: "Show me what data would be deleted if I clean up items older than 30 days"
+Claude: "Delete all contexts not updated in the last 6 months"
+```
+
 ## Default Roles
 
 The system includes five default roles, each with specialized focus areas:
@@ -188,6 +203,11 @@ The server supports these context types:
 13. **create_custom_role** - Create a new custom role with specific focus areas
 14. **delete_custom_role** - Remove a custom role you created
 15. **import_role_template** - Import a role template from JSON
+
+### Deletion Tools (v0.3.1)
+16. **delete_project** - Permanently delete a project and all associated data (requires confirmation)
+17. **delete_context** - Delete specific context entries from a project
+18. **cleanup_old_data** - Clean up data older than a specified time period (with dry-run preview)
 
 ## Creating Custom Roles
 
@@ -283,6 +303,14 @@ MIT License - see LICENSE file for details
 Brian Dawson
 
 ## Roadmap
+
+### ✅ v0.3.1 - Deletion Tools (Released!)
+- [x] Delete projects with all associated data
+- [x] Delete specific context entries
+- [x] Time-based cleanup with dry-run preview
+- [x] Performance optimizations for large datasets
+- [x] Fixed FTS5 search functionality
+- [x] Improved error handling
 
 ### ✅ v0.3.0 - Custom Roles (Released!)
 - [x] Create custom roles beyond the 5 defaults
