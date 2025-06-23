@@ -132,8 +132,13 @@ export async function cleanupOldData(db: DatabaseManager, input: unknown): Promi
     rawDb.transaction(() => {
       // Delete old projects and their contexts
       for (const project of oldProjects) {
-        // Delete from context_search first
-        rawDb.prepare('DELETE FROM context_search WHERE project_name = ?').run(project.name);
+        // Delete from context_search first (FTS5 entries for contexts)
+        rawDb.prepare(`
+          DELETE FROM context_search 
+          WHERE entity_id IN (
+            SELECT id FROM context_entries WHERE project_id = ?
+          ) AND entity_type = 'context'
+        `).run(project.id);
         
         // Delete related data
         rawDb.prepare('DELETE FROM role_handoffs WHERE project_id = ?').run(project.id);

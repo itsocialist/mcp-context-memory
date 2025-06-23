@@ -83,12 +83,10 @@ export async function deleteContext(db: DatabaseManager, input: unknown): Promis
     // Perform HARD delete
     rawDb.transaction(() => {
       // Delete from context_search first (FTS5 table)
-      if (context.project_name) {
-        rawDb.prepare(`
-          DELETE FROM context_search 
-          WHERE project_name = ? AND key = ?
-        `).run(context.project_name, contextKey);
-      }
+      rawDb.prepare(`
+        DELETE FROM context_search 
+        WHERE entity_id = ? AND entity_type = 'context'
+      `).run(context.id);
       
       // Delete the context entry
       rawDb.prepare('DELETE FROM context_entries WHERE id = ?').run(context.id);

@@ -100,8 +100,10 @@ export async function deleteProject(db: DatabaseManager, input: unknown): Promis
       // Delete from context_search first (FTS5 table)
       rawDb.prepare(`
         DELETE FROM context_search 
-        WHERE project_name = ?
-      `).run(projectName);
+        WHERE entity_id IN (
+          SELECT id FROM context_entries WHERE project_id = ?
+        ) AND entity_type = 'context'
+      `).run(project.id);
       
       // Delete all related data
       rawDb.prepare('DELETE FROM role_handoffs WHERE project_id = ?').run(project.id);
