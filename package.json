@@ -1,6 +1,6 @@
 {
   "name": "@briandawson/mcp-context-memory",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "MCP server for persistent project context memory across Claude sessions with role-based features",
   "main": "dist/index.js",
   "type": "module",

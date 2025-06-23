@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * MCP Context Memory Server
+ * MCP Context Memory Server v0.3.1
  * Provides persistent project context across Claude sessions
+ * This version adds deletion tools for data management
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -14,7 +15,7 @@ import {
 
 import { DatabaseManager } from './db/database.js';
 
-// Import tools
+// Import core tools
 import { createStoreProjectContextTool, handleStoreProjectContext } from './tools/storeProjectContext.js';
 import { createStoreContextTool, handleStoreContext } from './tools/storeContext.js';
 import { createSearchContextTool, handleSearchContext } from './tools/searchContext.js';
@@ -22,6 +23,8 @@ import { createGetProjectContextTool, handleGetProjectContext } from './tools/ge
 import { createListProjectsTool, handleListProjects } from './tools/listProjects.js';
 import { createUpdateProjectStatusTool, handleUpdateProjectStatus } from './tools/updateProjectStatus.js';
 import { createGetRecentUpdatesTool, handleGetRecentUpdates } from './tools/getRecentUpdates.js';
+
+// Import role tools
 import { listRolesTool, listRoles } from './tools/listRoles.js';
 import { getActiveRoleTool, getActiveRole } from './tools/getActiveRole.js';
 import { switchRoleTool, switchRole } from './tools/switchRole.js';
@@ -30,6 +33,11 @@ import { getRoleHandoffsTool, getRoleHandoffs } from './tools/getRoleHandoffs.js
 import { createCustomRoleTool, createCustomRole } from './tools/createCustomRole.js';
 import { deleteCustomRoleTool, deleteCustomRole } from './tools/deleteCustomRole.js';
 import { importRoleTemplateTool, importRoleTemplate } from './tools/importRoleTemplate.js';
+
+// Import deletion tools (v0.3.1)
+import { deleteProjectTool, deleteProject } from './tools/deleteProject.js';
+import { deleteContextTool, deleteContext } from './tools/deleteContext.js';
+import { cleanupOldDataTool, cleanupOldData } from './tools/cleanupOldData.js';
 
 class MCPContextMemoryServer {
   private server: Server;
@@ -40,7 +48,7 @@ class MCPContextMemoryServer {
     this.server = new Server(
       {
         name: 'mcp-context-memory',
-        version: '0.2.1',
+        version: '0.3.1',
       },
       {
         capabilities: {
@@ -56,6 +64,7 @@ class MCPContextMemoryServer {
     // Handle list tools request
     this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
       tools: [
+        // Core tools
         createStoreProjectContextTool(this.db),
         createStoreContextTool(this.db),
         createSearchContextTool(this.db),
@@ -63,6 +72,7 @@ class MCPContextMemoryServer {
         createListProjectsTool(this.db),
         createUpdateProjectStatusTool(this.db),
         createGetRecentUpdatesTool(this.db),
+        // Role tools
         listRolesTool,
         getActiveRoleTool,
         switchRoleTool,
@@ -71,6 +81,10 @@ class MCPContextMemoryServer {
         createCustomRoleTool,
         deleteCustomRoleTool,
         importRoleTemplateTool,
+        // Deletion tools (v0.3.1)
+        deleteProjectTool,
+        deleteContextTool,
+        cleanupOldDataTool,
       ],
     }));
 
@@ -82,9 +96,9 @@ class MCPContextMemoryServer {
         let result: string | { error: string; code?: string };
 
         switch (name) {
+          // Core tools
           case 'store_project_context':
             const projectResult = await handleStoreProjectContext(this.db, args);
-            // Check if it's an error response
             if (typeof projectResult === 'object' && 'error' in projectResult) {
               throw new Error(projectResult.error);
             }
@@ -112,6 +126,8 @@ class MCPContextMemoryServer {
           case 'get_recent_updates':
             result = await handleGetRecentUpdates(this.db, args);
             break;
+          
+          // Role tools
           case 'list_roles':
             const rolesResult = await listRoles(args);
             result = JSON.stringify(rolesResult, null, 2);
@@ -138,6 +154,18 @@ class MCPContextMemoryServer {
           case 'import_role_template':
             result = await importRoleTemplate(args);
             break;
+            
+          // Deletion tools (v0.3.1)
+          case 'delete_project':
+            result = await deleteProject(args);
+            break;
+          case 'delete_context':
+            result = await deleteContext(args);
+            break;
+          case 'cleanup_old_data':
+            result = await cleanupOldData(args);
+            break;
+            
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
