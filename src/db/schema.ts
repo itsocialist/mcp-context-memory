@@ -117,6 +117,8 @@ export const statements = {
     FROM context_entries ce
     LEFT JOIN systems s ON ce.system_id = s.id
     WHERE ce.project_id = ?
+    ORDER BY ce.updated_at DESC
+    LIMIT 100
   `,
   
   getSharedContext: `
